@@ -25,7 +25,7 @@ CUDA_VISIBLE_DEVICES=${gpu} python run_tasks.py --model ${model} --task ${task}
     --seed ${seed}
 "
 
-debug=0
+debug=1
 if [ ${debug} -eq 0 ]; then
 cmd="${cmd} --logging --expname ${expname}  > logs/${expname}.log 2>&1 &"
 else
