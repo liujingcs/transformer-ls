@@ -57,6 +57,7 @@ class Transformer(nn.Module):
         super().__init__()
 
         self.norm1 = nn.LayerNorm(config.transformer_dim)
+        self.attn_type = config.attn_type
         if config.attn_type == 'lsta':
             self.mha = AttentionLS(config)
         else:
@@ -80,9 +81,13 @@ class Transformer(nn.Module):
             if cls_embed.shape[0] == 1:
                 cls_embed = cls_embed.expand(X.shape[0], -1, -1)
             X_prepend = torch.cat([cls_embed, X], dim=1)
+            mask_prepend = torch.cat([torch.ones((mask.shape[0], 1), device=mask.device), mask], dim=1)
             if self.debug:
                 cls_embed = self.norm1(cls_embed)
-            X = self.dropout1(self.mha(self.norm1(X), mask, cls_embed)) + X_prepend
+            if self.attn_type == "lsta":
+                X = self.dropout1(self.mha(self.norm1(X), mask, cls_embed)) + X_prepend
+            else:
+                X = self.dropout1(self.mha(self.norm1(X_prepend), mask_prepend)) + X_prepend
         X = self.mlpblock(self.norm2(X)) + X
         return X
 
