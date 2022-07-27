@@ -75,7 +75,7 @@ class Attention(nn.Module):
 
         self.ff = nn.Linear(self.num_head * self.head_dim, self.dim)
 
-    def forward(self, X, mask):
+    def forward(self, X, mask, cls_embed=None):
 
         if self.attn_type.startswith("longformer") or self.attn_type.startswith("reformer"):
             with torch.cuda.amp.autocast(enabled = False):
